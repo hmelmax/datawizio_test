@@ -1,0 +1,43 @@
+{% extends "layouts.html" %}
+{% block head_block %}
+    <div class="dropdown">
+        <button onclick="myFunction()" class="dropbtn">User</button>
+          <div id="myDropdown" class="dropdown-content">
+            <a href="/">Main page</a>
+            <a href="logout">Logout</a>
+          </div>
+    </div>
+{% endblock %}
+{% block main %}
+<tr>
+<td>
+    <table border="1">
+        <tr>
+            <td>Name</td>
+            <td>{{ result.name }}</td>
+        </tr>
+        <tr>
+            <td>Date from</td>
+            <td>{{ result.date_from }}</td>
+        </tr>
+        <tr>
+            <td>Date to</td>
+            <td>{{ result.date_to }}</td>
+        </tr>
+    </table>
+</td>
+</tr>
+<tr>
+<td>
+    <table border="1">
+        {% for item in result.shops %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.address }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</td>
+</tr>
+
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends "layouts.html" %}
+{% block head_block %}
+    <div class="dropdown">
+        <button onclick="myFunction()" class="dropbtn">User</button>
+          <div id="myDropdown" class="dropdown-content">
+            <a href="user_information">User information</a>
+            <a href="logout">Logout</a>
+          </div>
+    </div>
+{% endblock %}
+{% block main %}
+<script>
+    function calendarChange(i_name, i_value) {
+        $.post("",
+        {
+            name: i_name,
+            value: i_value
+        },
+        function (data) {
+            if (data.length > 0){
+                alert(data);
+            }
+            else {
+                update_page();
+            }
+        });
+    }
+
+    function update_main_table(value_arr){
+        $("#turnover_one").html(parseFloat(value_arr[0][0]).toFixed(2));
+        $("#turnover_two").html(parseFloat(value_arr[0][1]).toFixed(2));
+        $("#turnover_difference_prc").html(parseFloat(value_arr[0][2]).toFixed(2));
+        $("#turnover_difference").html(parseFloat(value_arr[0][3]).toFixed(2));
+        $("#products_one").html(parseFloat(value_arr[1][0]).toFixed(2));
+        $("#products_two").html(parseFloat(value_arr[1][1]).toFixed(2));
+        $("#products_difference_prc").html(parseFloat(value_arr[1][2]).toFixed(2));
+        $("#products_difference").html(parseFloat(value_arr[1][3]).toFixed(2));
+        $("#receipts_one").html(parseFloat(value_arr[2][0]).toFixed(2));
+        $("#receipts_two").html(parseFloat(value_arr[2][1]).toFixed(2));
+        $("#receipts_difference_prc").html(parseFloat(value_arr[2][2]).toFixed(2));
+        $("#receipts_difference").html(parseFloat(value_arr[2][3]).toFixed(2));
+        $("#receipt_rnd_one").html(parseFloat(value_arr[3][0]).toFixed(2));
+        $("#receipt_rnd_two").html(parseFloat(value_arr[3][1]).toFixed(2));
+        $("#receipt_rnd_difference_prc").html(parseFloat(value_arr[3][2]).toFixed(2));
+        $("#receipt_rnd_difference").html(parseFloat(value_arr[3][3]).toFixed(2));
+    }
+
+    function product_changes_render(value_arr_up, value_arr_low) {
+        var low_table = $("#low");
+        var up_table = $("#up");
+        low_table.empty();
+        up_table.empty();
+        if (value_arr_low.length > 0){
+            for(i = 0; i < value_arr_low.length; i++){
+                var row = document.createElement("tr");
+                var td_0 = document.createElement("td");
+                td_0.innerHTML = value_arr_low[i][0];
+                row.appendChild(td_0);
+                var td_1 = document.createElement("td");
+                td_1.innerHTML = value_arr_low[i][1];
+                row.appendChild(td_1);
+                var td_2 = document.createElement("td");
+                td_2.innerHTML = value_arr_low[i][2];
+                row.appendChild(td_2);
+                low_table.append($(row));
+            }
+        }
+        if (value_arr_up.length > 0){
+            for(i = 0; i < value_arr_up.length; i++){
+                var row = document.createElement("tr");
+                var td_0 = document.createElement("td");
+                td_0.innerHTML = value_arr_up[i][0];
+                row.appendChild(td_0);
+                var td_1 = document.createElement("td");
+                td_1.innerHTML = value_arr_up[i][1];
+                row.appendChild(td_1);
+                var td_2 = document.createElement("td");
+                td_2.innerHTML = value_arr_up[i][2];
+                row.appendChild(td_2);
+                up_table.append($(row));
+            }
+        }
+    }
+
+    function get_page(page){
+        $.get("get_page/" + page,
+                function (data) {
+                    var tables = JSON.parse(data);
+                    product_changes_render(tables[0], tables[1]);
+                });
+    }
+
+    function update_page() {
+
+                $.get("get_main_table",
+                function (data) {
+                    update_main_table(JSON.parse(data));
+                });
+                $.get("get_pages_count",
+                function(data){
+                    $("#pages").empty();
+                    for (i=1; i <= JSON.parse(data); i++){
+                        $("#pages").append("<button type='button' onclick=get_page('" + i.toString() + "')>" + i.toString() + "</button>");
+
+                    }
+                });
+                get_page("1");
+
+    }
+
+
+    $(document).ready(
+            function () {
+                update_page();
+            }
+    );
+
+</script>
+<tr>
+<td>
+<table border="1">
+    <tr>
+        <th>Показник</th>
+        <th><input type="date" name="one" id="calendar" value="2015-11-18" onchange="calendarChange(this.name, this.value)"></th>
+        <th><input type="date" name="two" id="calendar_1" value="2015-11-17" onchange="calendarChange(this.name, this.value)"></th>
+        <th>Різниця у %</th>
+        <th>Різниця</th>
+    </tr>
+    <tr>
+        <td>Оборот</td>
+        <td id="turnover_one"></td>
+        <td id="turnover_two"></td>
+        <td id="turnover_difference_prc"></td>
+        <td id="turnover_difference"></td>
+    </tr>
+    <tr>
+        <td>Кількість товарів</td>
+        <td id="products_one"></td>
+        <td id="products_two"></td>
+        <td id="products_difference_prc"></td>
+        <td id="products_difference"></td>
+    </tr>
+    <tr>
+        <td>Кількість чеків</td>
+        <td id="receipts_one"></td>
+        <td id="receipts_two"></td>
+        <td id="receipts_difference_prc"></td>
+        <td id="receipts_difference"></td>
+    </tr>
+    <tr>
+        <td>Середній чек</td>
+        <td id="receipt_rnd_one"></td>
+        <td id="receipt_rnd_two"></td>
+        <td id="receipt_rnd_difference_prc"></td>
+        <td id="receipt_rnd_difference"></td>
+    </tr>
+
+
+</table>
+</td>
+</tr>
+    <tr>
+    <td>
+        <H1>Товари, які виросли в продажах </H1>
+        <table border="1">
+            <thead>
+            <tr>
+                <th>Назва товару</th>
+                <th>Зміна кількості продаж</th>
+                <th>Зміна обороту </th>
+            </tr>
+            </thead>
+            <tbody id="up"></tbody>
+        </table>
+    </td>
+    <td>
+        <H1>Товари, які впали в продажах </H1>
+        <table border="1">
+            <thead>
+            <tr>
+                <th>Назва товару</th>
+                <th>Зміна кількості продаж</th>
+                <th>Зміна обороту </th>
+            </tr>
+            </thead>
+            <tbody id="low"></tbody>
+        </table>
+    </td>
+    </tr>
+    <tr id="pages">
+    </tr>
+{% endblock %}
